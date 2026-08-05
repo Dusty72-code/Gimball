@@ -55,13 +55,15 @@ int8_t BSP_Joystick_GetYPercent(void) {
 uint8_t BSP_Joystick_IsSWPressed(void)
 {
     static uint32_t last_press_time = 0U;
+    static uint8_t first_done = 0U;
     static uint8_t last_state = 0U;
     uint8_t raw = (HAL_GPIO_ReadPin(SW_GPIO_Port, SW_Pin) == GPIO_PIN_RESET) ? 1U : 0U;
     if (raw != last_state) {
         last_state = raw;
         if (raw) {
             uint32_t now = HAL_GetTick();
-            if ((now - last_press_time) < 300U) return 0U;
+            if (first_done && ((now - last_press_time) < 300U)) return 0U;
+            first_done = 1U;
             last_press_time = now;
             return 1U;
         }

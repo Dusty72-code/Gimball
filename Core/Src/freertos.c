@@ -241,7 +241,7 @@ void StartCAN_RecvTask(void *argument)
       g_can_state.can_rx_cnt++;
       if (g_can_state.chassis_feedback_rx.chassis_heartbeat != g_can_state.last_chassis_hb) {
         g_can_state.last_chassis_hb = g_can_state.chassis_feedback_rx.chassis_heartbeat;
-        g_can_state.chassis_online  = 1U;
+        g_can_state.chassis_online = 1U;
       }
       taskEXIT_CRITICAL();
     }
@@ -369,15 +369,10 @@ void StartLEDTask(void *argument)
     }
     should_breath = g_can_state.can_comm_ok ? 0U : 1U;
     if (should_breath) {
-      uint8_t brightness = breath_table[breath_idx];
-      uint32_t on_time = (uint32_t)brightness * LED_BREATH_STEP_MS / LED_PWM_RESOLUTION;
-      uint32_t off_time = LED_BREATH_STEP_MS - on_time;
       HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-      if (on_time > 0U) vTaskDelay(pdMS_TO_TICKS(on_time));
+      vTaskDelay(pdMS_TO_TICKS(200));
       HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-      if (off_time > 0U) vTaskDelay(pdMS_TO_TICKS(off_time));
-      breath_idx++;
-      if (breath_idx >= LED_PWM_RESOLUTION) breath_idx = 0U;
+      vTaskDelay(pdMS_TO_TICKS(800));
     } else {
       HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
       vTaskDelay(pdMS_TO_TICKS(100));
