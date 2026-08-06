@@ -103,5 +103,7 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
     if (err & (HAL_CAN_ERROR_BOF | HAL_CAN_ERROR_EPV)) {
         HAL_CAN_Stop(hcan);
         HAL_CAN_Start(hcan);
+        /* re-activate RX IRQ notification lost after Stop/Start */
+        HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
     }
 }

@@ -371,13 +371,23 @@ void StartLEDTask(void *argument)
     }
     should_breath = g_can_state.can_comm_ok ? 0U : 1U;
     if (should_breath) {
-      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-      vTaskDelay(pdMS_TO_TICKS(200));
-      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-      vTaskDelay(pdMS_TO_TICKS(800));
+      /* software PWM breathing using breath_table */
+      uint8_t level = breath_table[breath_idx];
+      uint32_t on_ms  = (uint32_t)level * LED_BREATH_STEP_MS / 100U;
+      uint32_t off_ms = LED_BREATH_STEP_MS - on_ms;
+      if (on_ms > 0U) {
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+        vTaskDelay(pdMS_TO_TICKS(on_ms));
+      }
+      if (off_ms > 0U) {
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+        vTaskDelay(pdMS_TO_TICKS(off_ms));
+      }
+      breath_idx++;
+      if (breath_idx >= LED_PWM_RESOLUTION) breath_idx = 0U;
     } else {
       HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-      vTaskDelay(pdMS_TO_TICKS(100));
+      vTaskDelay(pdMS_TO_TICKS(200));
       breath_idx = 0U;
     }
     osDelay(1);
