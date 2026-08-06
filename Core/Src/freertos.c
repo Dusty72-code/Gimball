@@ -364,6 +364,7 @@ void StartLEDTask(void *argument)
 {
   /* USER CODE BEGIN StartLEDTask */
   (void)argument;
+  LED_StartBlink();   /* 3 power-on blinks via vTaskDelay (no NOP spin) */
   uint8_t breath_idx = 0U;
   uint8_t should_breath = 0U;
   /* Infinite loop */

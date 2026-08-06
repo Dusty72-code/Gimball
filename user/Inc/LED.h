@@ -11,5 +11,6 @@
 #define LED_PWM_RESOLUTION 100U
 
 void LED_Status_Init(void);
+void LED_StartBlink(void);
 
 #endif //GIMBALL_LED_H

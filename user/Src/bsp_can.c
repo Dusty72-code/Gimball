@@ -64,6 +64,10 @@ void BSP_CAN_FilterInit(void)
     filter_cfg.FilterFIFOAssignment = CAN_RX_FIFO0;
     HAL_CAN_ConfigFilter(&hcan, &filter_cfg);
     HAL_CAN_Start(&hcan);
+    /* Disable error interrupt (SCE) to prevent ACK-error storms from
+       interfering with normal RX-FIFO interrupt processing.
+       Error states (BOF/EPV) are monitored by the receive task instead. */
+    __HAL_CAN_DISABLE_IT(&hcan, CAN_IT_ERROR);
     HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
@@ -99,11 +103,4 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
     if (hcan->Instance != CAN1) return;
     can_rx_error_cnt++;
-    uint32_t err = HAL_CAN_GetError(hcan);
-    if (err & (HAL_CAN_ERROR_BOF | HAL_CAN_ERROR_EPV)) {
-        HAL_CAN_Stop(hcan);
-        HAL_CAN_Start(hcan);
-        /* re-activate RX IRQ notification lost after Stop/Start */
-        HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
-    }
 }
