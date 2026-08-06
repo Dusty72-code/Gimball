@@ -44,6 +44,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define CAN_HEARTBEAT_MASK 0xFFU
+#define CAN_SLOW_SEND_PERIOD_MS 100U
 #define SELF_TEST_PHASE_DURATION_MS 1000U
 
 /* USER CODE END PD */
@@ -198,7 +199,10 @@ void StartCAN_SendTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CAN_SEND_PERIOD_MS));
+    /* slow 100ms send when no peer to avoid Bus-Off; 10ms when connected */
+    uint32_t period = g_can_state.can_comm_ok
+                    ? CAN_SEND_PERIOD_MS : CAN_SLOW_SEND_PERIOD_MS;
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(period));
     taskENTER_CRITICAL();
     g_can_state.gimbal_ctrl.gimbal_heartbeat = g_can_state.gimbal_heartbeat;
     GimbalCtrlMsg_t ctrl = g_can_state.gimbal_ctrl;
