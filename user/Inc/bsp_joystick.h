@@ -11,12 +11,18 @@
 #define JOYSTICK_ADC_MAX 4095U
 #define JOYSTICK_CENTER 2048U
 #define JOYSTICK_DEADZONE 200U
+#define JOYSTICK_CAL_DEADZONE 80U
 #define JOYSTICK_SAMPLE_PERIOD_MS 10U
+#define JOYSTICK_CAL_SAMPLES 120U
 
 uint16_t BSP_Joystick_ReadX(void);
 uint16_t BSP_Joystick_ReadY(void);
 int8_t BSP_Joystick_GetXPercent(void);
 int8_t BSP_Joystick_GetYPercent(void);
 uint8_t BSP_Joystick_IsSWPressed(void);
+void BSP_Joystick_Calibrate(void);
+uint8_t BSP_Joystick_IsCalibrated(void);
+uint16_t BSP_Joystick_GetCalCenterX(void);
+uint16_t BSP_Joystick_GetCalCenterY(void);
 
 #endif //GIMBALL_BSP_JOYSTICK_H

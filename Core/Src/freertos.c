@@ -299,6 +299,8 @@ void StartJoystickTask(void *argument)
 {
   /* USER CODE BEGIN StartJoystickTask */
   (void)argument;
+  /* Calibrate joystick centre (keep sticks untouched during power-up) */
+  BSP_Joystick_Calibrate();
   TickType_t xLastWakeTime = xTaskGetTickCount();
   /* Infinite loop */
   for(;;)
